@@ -9,8 +9,15 @@ const homePage = `<!DOCTYPE html>
 		<form action="/vault" method="post">
 			<label for="address">Address</label>
 			<input type="text" id="address" name="address" placeholder="{{ .Address }}">
-			<label for="token">Token</label>
-			<input type="text" id="token" name="token" placeholder="{{ .Token }}">
+
+			<label for="approle">AppRole</label>
+			<input type="text" id="approle" name="approle" value="applications">
+
+			<label for="role_id">RoleID</label>
+			<input type="text" id="role_id" name="role_id">
+
+			<label for="secret_id">SecretID</label>
+			<input type="text" id="secret_id" name="secret_id">
 			<input type="submit">
 		</form>
 	</body>
@@ -55,7 +62,7 @@ const vaultPage = `<!DOCTYPE html>
 
 			<dt>Version</dt>
 			<dd>{{ .Version }}</dd>
-	
+
 			<dt>Cluster</dt>
 			<dd>{{ .ClusterName }} - {{ .ClusterID }}</dd>
 		</dl>

@@ -63,10 +63,8 @@ func (app *Application) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (app *Application) home(w http.ResponseWriter, r *http.Request) {
 	data := struct {
 		Address string
-		Token   string
 	}{
 		app.vaultClient.Address(),
-		app.vaultClient.Token(),
 	}
 	err := app.templates["home"].Execute(w, data)
 	if err != nil {
@@ -87,10 +85,28 @@ func (app *Application) vault(w http.ResponseWriter, r *http.Request) {
 		app.vaultClient.SetAddress(r.Form.Get("address"))
 	}
 
-	token := r.Form.Get("token")
-	if token != "" {
-		app.vaultClient.SetToken(r.Form.Get("token"))
+	appRole := r.Form.Get("approle")
+	roleID := r.Form.Get("role_id")
+	secretID := r.Form.Get("secret_id")
+
+	path := path.Join(
+		"auth",
+		appRole,
+		"login",
+	)
+
+	payload := make(map[string]interface{})
+	payload["role_id"] = roleID
+	payload["secret_id"] = secretID
+
+	secret, err := app.vaultClient.Logical().Write(path, payload)
+	if err != nil {
+		log.Errorf("Parsing form: %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
+
+	app.vaultClient.SetToken(secret.Auth.ClientToken)
 
 	response, err := app.vaultClient.Sys().Health()
 	if err != nil {
